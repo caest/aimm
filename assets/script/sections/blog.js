@@ -67,6 +67,8 @@ const setWillChange = (els, v) => {
 }
 
 const initBlogPremium = (blog) => {
+  const isMobile = window.innerWidth <= 992
+  
   const lineH = blog.querySelector('.blog-line-horizontal')
   const lineV = blog.querySelector('.blog-line-vertical')
 
@@ -118,15 +120,16 @@ const initBlogPremium = (blog) => {
   const makeDur = () => {
     const w = typeof window !== 'undefined' ? window.innerWidth : 1440
     const k = clamp(w / 1440, 0.85, 1.08)
+    const base = isMobile ? 0.85 : 1
     return {
-      lines: 0.9 / k,
-      title: 1.05 / k,
-      clip: 1.05 / k,
-      card: 0.95 / k,
-      image: 1.05 / k,
-      meta: 0.65 / k,
-      text: 0.85 / k,
-      buttons: 0.75 / k,
+      lines: 0.9 / k * base,
+      title: 1.05 / k * base,
+      clip: 1.05 / k * base,
+      card: 0.95 / k * base,
+      image: 1.05 / k * base,
+      meta: 0.65 / k * base,
+      text: 0.85 / k * base,
+      buttons: 0.75 / k * base,
     }
   }
 
@@ -139,7 +142,7 @@ const initBlogPremium = (blog) => {
     if (titleChars.length) {
       gsap.set(titleChars, reduce
         ? { opacity: 1, yPercent: 0, rotate: 0 }
-        : { opacity: 0, yPercent: 120, rotate: 1.2, transformOrigin: '50% 100%' }
+        : { opacity: 0, yPercent: isMobile ? 80 : 120, rotate: isMobile ? 0.8 : 1.2, transformOrigin: '50% 100%' }
       )
     }
 
@@ -151,33 +154,33 @@ const initBlogPremium = (blog) => {
 
       gsap.set(it.s, reduce
         ? { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }
-        : { opacity: 0, y: 16, filter: 'blur(12px)', scale: 0.992, transformOrigin: '50% 60%' }
+        : { opacity: 0, y: isMobile ? 12 : 16, filter: isMobile ? 'blur(8px)' : 'blur(12px)', scale: isMobile ? 0.996 : 0.992, transformOrigin: '50% 60%' }
       )
 
       if (it.img) gsap.set(it.img, reduce
         ? { scale: 1, filter: 'blur(0px)', backgroundSize: '100%' }
-        : { scale: 1.03, filter: 'blur(10px)', backgroundSize: '112%' }
+        : { scale: isMobile ? 1.02 : 1.03, filter: isMobile ? 'blur(8px)' : 'blur(10px)', backgroundSize: isMobile ? '108%' : '112%' }
       )
 
       if (it.imageMask) gsap.set(it.imageMask, reduce ? { scaleX: 0 } : { scaleX: 1, transformOrigin: '0% 50%' })
 
-      if (it.date) gsap.set(it.date, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(8px)' })
+      if (it.date) gsap.set(it.date, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: isMobile ? 8 : 10, filter: isMobile ? 'blur(6px)' : 'blur(8px)' })
       if (it.dateMask) gsap.set(it.dateMask, reduce ? { scaleX: 0 } : { scaleX: 1, transformOrigin: '0% 50%' })
 
       if (it.hMask) gsap.set(it.hMask, reduce ? { scaleX: 0 } : { scaleX: 1, transformOrigin: '0% 50%' })
       if (it.hWords.length) {
-        gsap.set(it.hWords, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 12, filter: 'blur(10px)' })
+        gsap.set(it.hWords, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: isMobile ? 8 : 12, filter: isMobile ? 'blur(8px)' : 'blur(10px)' })
       }
     })
 
-    if (prev) gsap.set(prev, prefersReducedMotion() ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(8px)' })
-    if (next) gsap.set(next, prefersReducedMotion() ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(8px)' })
+    if (prev) gsap.set(prev, prefersReducedMotion() ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: isMobile ? 8 : 10, filter: isMobile ? 'blur(6px)' : 'blur(8px)' })
+    if (next) gsap.set(next, prefersReducedMotion() ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: isMobile ? 8 : 10, filter: isMobile ? 'blur(6px)' : 'blur(8px)' })
 
-    if (prevText) gsap.set(prevText, prefersReducedMotion() ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 })
-    if (nextText) gsap.set(nextText, prefersReducedMotion() ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 })
+    if (prevText) gsap.set(prevText, prefersReducedMotion() ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? 6 : 8 })
+    if (nextText) gsap.set(nextText, prefersReducedMotion() ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? 6 : 8 })
 
-    if (prevArrow) gsap.set(prevArrow, prefersReducedMotion() ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 8, transformOrigin: '50% 50%' })
-    if (nextArrow) gsap.set(nextArrow, prefersReducedMotion() ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: -10, rotate: -8, transformOrigin: '50% 50%' })
+    if (prevArrow) gsap.set(prevArrow, prefersReducedMotion() ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: isMobile ? 8 : 10, rotate: isMobile ? 6 : 8, transformOrigin: '50% 50%' })
+    if (nextArrow) gsap.set(nextArrow, prefersReducedMotion() ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: isMobile ? -8 : -10, rotate: isMobile ? -6 : -8, transformOrigin: '50% 50%' })
   }
 
   const buildTimeline = () => {
@@ -185,7 +188,7 @@ const initBlogPremium = (blog) => {
     const d = makeDur()
 
     const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } })
-    tl.timeScale(1.06)
+    tl.timeScale(isMobile ? 1.0 : 1.06)
 
     if (reduce) {
       tl.add(() => reset(), 0)
@@ -193,13 +196,13 @@ const initBlogPremium = (blog) => {
     }
 
     const t0 = 0
-    const tTitle = 0.18
-    const tClip = 0.58
-    const tCards = 0.72
-    const tBtns = 1.55
+    const tTitle = isMobile ? 0.12 : 0.18
+    const tClip = isMobile ? 0.45 : 0.58
+    const tCards = isMobile ? 0.55 : 0.72
+    const tBtns = isMobile ? 1.2 : 1.55
 
     if (lineH) tl.to(lineH, { scaleX: 1, duration: d.lines, ease: 'power2.out' }, t0)
-    if (lineV) tl.to(lineV, { scaleY: 1, duration: d.lines + 0.08, ease: 'power2.out' }, t0 + 0.08)
+    if (lineV) tl.to(lineV, { scaleY: 1, duration: d.lines + (isMobile ? 0.04 : 0.08), ease: 'power2.out' }, t0 + (isMobile ? 0.04 : 0.08))
 
     if (titleChars.length) {
       tl.to(titleChars, {
@@ -208,14 +211,14 @@ const initBlogPremium = (blog) => {
         rotate: 0,
         duration: d.title,
         ease: 'power4.out',
-        stagger: { each: 0.022, from: 'start' },
+        stagger: { each: isMobile ? 0.016 : 0.022, from: 'start' },
       }, tTitle)
     }
 
     if (slider) tl.to(slider, { clipPath: 'inset(0% 0% 0% 0%)', duration: d.clip, ease: 'power4.out' }, tClip)
 
     slideMeta.forEach((it, i) => {
-      const t = tCards + i * 0.085
+      const t = tCards + i * (isMobile ? 0.06 : 0.085)
 
       if (it.s) {
         tl.to(it.s, {
@@ -228,16 +231,16 @@ const initBlogPremium = (blog) => {
         }, t)
       }
 
-      if (it.imageMask) tl.to(it.imageMask, { scaleX: 0, duration: 0.55, ease: 'power3.inOut' }, t + 0.06)
+      if (it.imageMask) tl.to(it.imageMask, { scaleX: 0, duration: isMobile ? 0.45 : 0.55, ease: 'power3.inOut' }, t + (isMobile ? 0.04 : 0.06))
 
       if (it.img) {
-        tl.to(it.img, { scale: 1, backgroundSize: '100%', filter: 'blur(0px)', duration: d.image, ease: 'power3.out' }, t + 0.04)
+        tl.to(it.img, { scale: 1, backgroundSize: '100%', filter: 'blur(0px)', duration: d.image, ease: 'power3.out' }, t + (isMobile ? 0.03 : 0.04))
       }
 
-      if (it.dateMask) tl.to(it.dateMask, { scaleX: 0, duration: 0.45, ease: 'power3.inOut' }, t + 0.18)
-      if (it.date) tl.to(it.date, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d.meta, ease: 'power3.out' }, t + 0.22)
+      if (it.dateMask) tl.to(it.dateMask, { scaleX: 0, duration: isMobile ? 0.35 : 0.45, ease: 'power3.inOut' }, t + (isMobile ? 0.12 : 0.18))
+      if (it.date) tl.to(it.date, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d.meta, ease: 'power3.out' }, t + (isMobile ? 0.15 : 0.22))
 
-      if (it.hMask) tl.to(it.hMask, { scaleX: 0, duration: 0.5, ease: 'power3.inOut' }, t + 0.28)
+      if (it.hMask) tl.to(it.hMask, { scaleX: 0, duration: isMobile ? 0.4 : 0.5, ease: 'power3.inOut' }, t + (isMobile ? 0.18 : 0.28))
       if (it.hWords.length) {
         tl.to(it.hWords, {
           opacity: 1,
@@ -245,19 +248,19 @@ const initBlogPremium = (blog) => {
           filter: 'blur(0px)',
           duration: d.text,
           ease: 'power3.out',
-          stagger: { each: 0.018, from: 'start' },
-        }, t + 0.34)
+          stagger: { each: isMobile ? 0.012 : 0.018, from: 'start' },
+        }, t + (isMobile ? 0.22 : 0.34))
       }
     })
 
     if (prev) tl.to(prev, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d.buttons, ease: 'power3.out' }, tBtns)
-    if (next) tl.to(next, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d.buttons, ease: 'power3.out' }, tBtns + 0.08)
+    if (next) tl.to(next, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d.buttons, ease: 'power3.out' }, tBtns + (isMobile ? 0.04 : 0.08))
 
-    if (prevText) tl.to(prevText, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, tBtns + 0.02)
-    if (nextText) tl.to(nextText, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, tBtns + 0.1)
+    if (prevText) tl.to(prevText, { opacity: 1, y: 0, duration: isMobile ? 0.4 : 0.55, ease: 'power3.out' }, tBtns + (isMobile ? 0.01 : 0.02))
+    if (nextText) tl.to(nextText, { opacity: 1, y: 0, duration: isMobile ? 0.4 : 0.55, ease: 'power3.out' }, tBtns + (isMobile ? 0.05 : 0.1))
 
-    if (prevArrow) tl.to(prevArrow, { opacity: 1, x: 0, rotate: 0, duration: 0.7, ease: 'power3.out' }, tBtns + 0.05)
-    if (nextArrow) tl.to(nextArrow, { opacity: 1, x: 0, rotate: 0, duration: 0.7, ease: 'power3.out' }, tBtns + 0.13)
+    if (prevArrow) tl.to(prevArrow, { opacity: 1, x: 0, rotate: 0, duration: isMobile ? 0.55 : 0.7, ease: 'power3.out' }, tBtns + (isMobile ? 0.03 : 0.05))
+    if (nextArrow) tl.to(nextArrow, { opacity: 1, x: 0, rotate: 0, duration: isMobile ? 0.55 : 0.7, ease: 'power3.out' }, tBtns + (isMobile ? 0.07 : 0.13))
 
     return tl
   }
@@ -266,7 +269,7 @@ const initBlogPremium = (blog) => {
 
   const applyPremiumHover = () => {
     const reduce = prefersReducedMotion()
-    if (reduce) return
+    if (reduce || isMobile) return
 
     slideMeta.forEach((it) => {
       if (!it.s || !it.img) return
@@ -313,11 +316,14 @@ const initBlogPremium = (blog) => {
   const rebuildOnResize = () => {
     if (rAF) cancelAnimationFrame(rAF)
     rAF = requestAnimationFrame(() => {
-      if (tl) {
-        tl.kill()
-        tl = null
+      const newIsMobile = window.innerWidth <= 992
+      if (isMobile !== newIsMobile) {
+        if (tl) {
+          tl.kill()
+          tl = null
+        }
+        reset()
       }
-      reset()
     })
   }
   window.addEventListener('resize', rebuildOnResize, { passive: true })
