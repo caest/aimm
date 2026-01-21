@@ -80,8 +80,16 @@ const buildVLines = (social, vwrap) => {
   if (!links.length) return []
 
   const sRect = social.getBoundingClientRect()
+  
+  // Получаем ширину окна
+  const windowWidth = window.innerWidth
+  // Определяем, нужно ли ограничивать количество линий до 1
+  const shouldLimitToOne = windowWidth <= 992
+  
+  // Если ширина окна <= 992px, берем только первую ссылку
+  const linksToProcess = shouldLimitToOne ? [links[0]] : links
 
-  return links.map((a, i) => {
+  return linksToProcess.map((a, i) => {
     const r = a.getBoundingClientRect()
     const x = Math.round(r.right - sRect.left)
 
@@ -287,12 +295,17 @@ const initSocialPremium = (social) => {
 
   rebuild()
 
-  const ro = new ResizeObserver(() => {
+  const handleResize = () => {
     stopRows()
     rebuild()
     startRows()
     ScrollTrigger.refresh()
-  })
+  }
+
+  const ro = new ResizeObserver(handleResize)
+  
+  // Также отслеживаем изменение размера окна
+  window.addEventListener('resize', handleResize)
 
   ro.observe(social)
   links.forEach((a) => ro.observe(a))
@@ -328,6 +341,12 @@ const initSocialPremium = (social) => {
   })
 
   ScrollTrigger.refresh()
+  
+  // Убираем обработчик при уничтожении компонента (опционально)
+  return () => {
+    window.removeEventListener('resize', handleResize)
+    ro.disconnect()
+  }
 }
 
 export const initSocial = () => {

@@ -158,17 +158,13 @@ const initPhilosophyPremium = (ph) => {
 
     const tl = gsap.timeline({ paused: true })
     
-    animatedElements.forEach((el, index) => {
-      if (el) {
-        tl.to(el, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power2.out',
-          delay: index * 0.1
-        }, 0)
-      }
-    })
+    tl.to(animatedElements, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+      stagger: 0.1
+    }, 0)
 
     makeTrigger({
       trigger: ph,
@@ -210,9 +206,6 @@ const initPhilosophyPremium = (ph) => {
 
   const pLines = leftPs.flatMap((p) => wrapLinesInP(p))
 
-  const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } })
-  tl.timeScale(1)
-
   const reset = () => {
     if (lineH) gsap.set(lineH, { scaleX: reduce ? 1 : 0, transformOrigin: '0% 50%' })
     if (lineV) gsap.set(lineV, { scaleY: reduce ? 1 : 0, transformOrigin: '50% 0%' })
@@ -244,31 +237,50 @@ const initPhilosophyPremium = (ph) => {
     if (controls) gsap.set(controls, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(10px)' })
     if (fraction) gsap.set(fraction, reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 })
     if (progress) gsap.set(progress, reduce ? { scaleX: 1 } : { scaleX: 0, transformOrigin: '0% 50%' })
-
-    tl.pause(0)
   }
 
-  const tLines = 0
-  const tTitle = 0.22
-  const tDesc = 0.58
-  const tLeft = 1.05
-  const tSlider = 1.45
-  const tControls = 2.1
+  const applyHover = () => {
+    if (reduce) return
 
+    if (leftImg) {
+      leftImg.addEventListener('mouseenter', () => gsap.to(leftImg, { scale: 1.03, duration: 0.6, ease: 'power3.out' }))
+      leftImg.addEventListener('mouseleave', () => gsap.to(leftImg, { scale: 1, duration: 0.7, ease: 'power3.out' }))
+    }
+
+    slideImgs.forEach((img) => {
+      img.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.04, duration: 0.6, ease: 'power3.out' }))
+      img.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.7, ease: 'power3.out' }))
+    })
+  }
+
+  reset()
+  applyHover()
+
+  // Быстрая анимация при скролле
   if (!reduce) {
-    if (lineH) tl.to(lineH, { scaleX: 1, duration: 0.95, ease: 'power2.out' }, tLines)
-    if (lineV) tl.to(lineV, { scaleY: 1, duration: 1.05, ease: 'power2.out' }, tLines + 0.08)
-    if (lineHT) tl.to(lineHT, { scaleX: 1, duration: 0.95, ease: 'power2.out' }, tLines + 0.18)
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ph,
+        start: 'top 75%',
+        end: 'bottom 50%',
+        scrub: 0.8,
+        markers: false
+      }
+    })
+
+    if (lineH) tl.to(lineH, { scaleX: 1, duration: 0.8, ease: 'power2.out' }, 0)
+    if (lineV) tl.to(lineV, { scaleY: 1, duration: 0.9, ease: 'power2.out' }, 0.1)
+    if (lineHT) tl.to(lineHT, { scaleX: 1, duration: 0.8, ease: 'power2.out' }, 0.15)
 
     if (titleChars.length) {
       tl.to(titleChars, {
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: 1.15,
+        duration: 1.0,
         ease: 'power3.out',
-        stagger: { each: 0.055, from: 'start' }
-      }, tTitle)
+        stagger: { each: 0.04, from: 'start' }
+      }, 0.2)
     }
 
     if (descWords.length) {
@@ -276,66 +288,36 @@ const initPhilosophyPremium = (ph) => {
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: 1.2,
+        duration: 1.1,
         ease: 'power3.out',
-        stagger: { each: 0.035, from: 'start' }
-      }, tDesc)
+        stagger: { each: 0.025, from: 'start' }
+      }, 0.5)
     }
 
-    if (leftImgMask) tl.to(leftImgMask, { scaleX: 0, duration: 0.6, ease: 'power3.inOut' }, tLeft - 0.08)
-    if (leftImg) tl.to(leftImg, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.05, ease: 'power3.out' }, tLeft)
+    if (leftImgMask) tl.to(leftImgMask, { scaleX: 0, duration: 0.5, ease: 'power3.inOut' }, 0.9)
+    if (leftImg) tl.to(leftImg, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out' }, 1.0)
 
-    if (leftTextMask) tl.to(leftTextMask, { scaleX: 0, duration: 0.6, ease: 'power3.inOut' }, tLeft + 0.14)
+    if (leftTextMask) tl.to(leftTextMask, { scaleX: 0, duration: 0.5, ease: 'power3.inOut' }, 1.1)
     if (pLines.length) {
       tl.to(pLines, {
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: 1.0,
+        duration: 0.8,
         ease: 'power3.out',
-        stagger: { each: 0.06, from: 'start' }
-      }, tLeft + 0.22)
+        stagger: { each: 0.04, from: 'start' }
+      }, 1.2)
     }
 
-    if (sliderWrapMask) tl.to(sliderWrapMask, { scaleX: 0, duration: 0.65, ease: 'power3.inOut' }, tSlider - 0.1)
-    if (sliderWrap) tl.to(sliderWrap, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power4.out' }, tSlider)
-    if (slider) tl.to(slider, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.95, ease: 'power3.out' }, tSlider + 0.06)
-    if (slideImgs.length) tl.to(slideImgs, { scale: 1, filter: 'blur(0px)', duration: 1.15, ease: 'power3.out' }, tSlider + 0.1)
+    if (sliderWrapMask) tl.to(sliderWrapMask, { scaleX: 0, duration: 0.6, ease: 'power3.inOut' }, 1.5)
+    if (sliderWrap) tl.to(sliderWrap, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.9, ease: 'power4.out' }, 1.6)
+    if (slider) tl.to(slider, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out' }, 1.7)
+    if (slideImgs.length) tl.to(slideImgs, { scale: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out' }, 1.8)
 
-    if (controls) tl.to(controls, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.85, ease: 'power3.out' }, tControls)
-    if (fraction) tl.to(fraction, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, tControls + 0.05)
-    if (progress) tl.to(progress, { scaleX: 1, duration: 1.0, ease: 'power2.out' }, tControls + 0.12)
-  } else {
-    tl.add(() => {}, 0)
+    if (controls) tl.to(controls, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power3.out' }, 2.0)
+    if (fraction) tl.to(fraction, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, 2.05)
+    if (progress) tl.to(progress, { scaleX: 1, duration: 0.8, ease: 'power2.out' }, 2.1)
   }
-
-  const applyHover = () => {
-    if (reduce) return
-
-    if (leftImg) {
-      leftImg.addEventListener('mouseenter', () => gsap.to(leftImg, { scale: 1.03, duration: 0.9, ease: 'power3.out' }))
-      leftImg.addEventListener('mouseleave', () => gsap.to(leftImg, { scale: 1, duration: 0.95, ease: 'power3.out' }))
-    }
-
-    slideImgs.forEach((img) => {
-      img.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.04, duration: 0.9, ease: 'power3.out' }))
-      img.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.95, ease: 'power3.out' }))
-    })
-  }
-
-  reset()
-  applyHover()
-
-  makeTrigger({
-    trigger: ph,
-    start: 'top 85%',
-    end: 'bottom top',
-    once: false,
-    onEnter: () => { reset(); tl.play(0) },
-    onEnterBack: () => { reset(); tl.play(0) },
-    onLeave: () => { tl.pause(0); reset() },
-    onLeaveBack: () => { tl.pause(0); reset() }
-  })
 }
 
 export const initPhilosophy = () => {

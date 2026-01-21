@@ -4026,6 +4026,9 @@ body {
   }
 }
 @media (max-width: 992px) {
+  .philosophy-line-vertical {
+    z-index: -1;
+  }
   .clients-line-vertical {
     display: none;
   }
