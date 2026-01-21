@@ -603,11 +603,24 @@ const initProjectsDesktop = () => {
     const label = labelSel ? q(block, labelSel) : null
     const name = nameSel ? q(block, nameSel) : null
 
-    if (label) storeTextOnce(label, `label_${block.className || 'b'}`)
-    if (name) storeTextOnce(name, `name_${block.className || 'b'}`)
+    // Исправление: очищаем ключ от недопустимых символов
+    const getSafeKey = (el, prefix) => {
+      if (!el) return ''
+      const className = el.className || ''
+      // Оставляем только буквы, цифры и подчеркивания
+      const safe = className.replace(/[^a-zA-Z0-9]/g, '_')
+      return `${prefix}_${safe || 'b'}`
+    }
+
+    const labelKey = getSafeKey(block, 'label')
+    const nameKey = getSafeKey(block, 'name')
+
+    if (label) storeTextOnce(label, labelKey)
+    if (name) storeTextOnce(name, nameKey)
+    
     restore.push(() => {
-      restoreText(label, `label_${block.className || 'b'}`)
-      restoreText(name, `name_${block.className || 'b'}`)
+      restoreText(label, labelKey)
+      restoreText(name, nameKey)
       qa(block, '[data-reveal-mask]').forEach((m) => m.remove())
     })
 
@@ -772,11 +785,15 @@ const initProjectsDesktop = () => {
     const label = q(block, '.projects-label')
     const name = q(block, '.projects-name')
 
-    if (label) storeTextOnce(label, 'p4_label')
-    if (name) storeTextOnce(name, 'p4_name')
+    // Используем фиксированные безопасные ключи для проекта 4
+    const labelKey = 'p4_label'
+    const nameKey = 'p4_name'
+
+    if (label) storeTextOnce(label, labelKey)
+    if (name) storeTextOnce(name, nameKey)
     restore.push(() => {
-      restoreText(label, 'p4_label')
-      restoreText(name, 'p4_name')
+      restoreText(label, labelKey)
+      restoreText(name, nameKey)
       qa(block, '[data-reveal-mask]').forEach((m) => m.remove())
     })
 
