@@ -3927,7 +3927,7 @@ body {
     overflow: initial;
   }
   .hero-link {
-    right: -25px;
+    right: 10px;
     bottom: -140px;
     width: 207px;
     height: 207px;
@@ -3939,7 +3939,7 @@ body {
   .hero-description-mobile {
     font-weight: 400;
     font-size: 12px;
-    max-width: 180px;
+    max-width: 115px;
     padding-top: 15px;
     display: block;
   }
