@@ -4699,7 +4699,7 @@ body {
     padding-bottom: 20px;
   }
   .clients-title {
-    font-size: 43px;
+    font-size: 35px;
   }
   .clients-count {
     font-size: 11px;
@@ -4803,7 +4803,7 @@ body {
 }
 @media (max-width: 540px) {
   .hero-title {
-    font-size: 65px;
+    font-size: 58px;
   }
 }
 .projects-count-wrap {
