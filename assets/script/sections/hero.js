@@ -1,5 +1,12 @@
 import { splitToChars, makeTrigger } from '../core.js'
 
+const MQ_MOBILE = '(max-width: 992px)'
+
+const isMobile = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia(MQ_MOBILE).matches
+
 const initHeroTitle = (hero) => {
   const title = hero.querySelector('.hero-title[data-anim="titleChars"]')
   if (!title) return
@@ -7,18 +14,47 @@ const initHeroTitle = (hero) => {
   const rows = title.querySelectorAll('.hero-title-row')
   if (!rows.length) return
 
-  const chars = []
-  rows.forEach((row) => chars.push(...splitToChars(row)))
-
+  const mobile = isMobile()
   const tl = gsap.timeline({ paused: true })
   tl.timeScale(1.05)
 
+  let chars = []
+  if (!mobile) {
+    rows.forEach((row) => chars.push(...splitToChars(row)))
+  }
+
   const reset = () => {
+    if (mobile) {
+      gsap.set(title, { opacity: 0, y: 18, filter: 'blur(6px)' })
+      tl.pause(0)
+      return
+    }
+
     gsap.set(chars, { opacity: 0, yPercent: 120, rotate: 2, transformOrigin: '50% 100%' })
     tl.pause(0)
   }
 
   reset()
+
+  if (mobile) {
+    tl.to(title, {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      duration: 0.75,
+      ease: 'power3.out'
+    })
+
+    makeTrigger({
+      trigger: hero,
+      start: 'top 85%',
+      end: 'bottom top',
+      once: true,
+      onEnter: () => tl.play(0)
+    })
+
+    return
+  }
 
   tl.to(chars, {
     opacity: 1,
@@ -54,6 +90,12 @@ const ensureMask = (el, bgEl) => {
   if (cs.position === 'static') el.style.position = 'relative'
   el.style.overflow = 'hidden'
 
+  const existing = el.querySelector(':scope > [data-reveal-mask]')
+  if (existing) {
+    gsap.set(existing, { scaleX: 1 })
+    return existing
+  }
+
   const mask = document.createElement('span')
   mask.setAttribute('data-reveal-mask', '')
   mask.style.position = 'absolute'
@@ -70,7 +112,6 @@ const ensureMask = (el, bgEl) => {
 
   el.appendChild(mask)
   gsap.set(mask, { scaleX: 1 })
-
   return mask
 }
 
@@ -100,8 +141,8 @@ const initHeroScrollButton = (hero) => {
 }
 
 const initHeroPremiumRest = (hero) => {
-  const isMobile = window.innerWidth <= 992
-  
+  const mobile = isMobile()
+
   const vLine = hero.querySelector('.hero-line-vertical')
   const hLine = hero.querySelector('.hero-line-horizontal')
 
@@ -128,193 +169,129 @@ const initHeroPremiumRest = (hero) => {
   const descMMask = ensureMask(descM, hero)
 
   const tl = gsap.timeline({ paused: true })
-  tl.timeScale(isMobile ? 1.0 : 1.15)
+  tl.timeScale(1.15)
 
-  let oncePlayed = false
-
-  const reset = () => {
+  const resetDesktop = () => {
     if (vLine) gsap.set(vLine, { scaleY: 0, transformOrigin: '50% 0%' })
     if (hLine) gsap.set(hLine, { scaleX: 0, transformOrigin: '0% 50%' })
 
     if (sliderWrap) gsap.set(sliderWrap, { clipPath: 'inset(0% 0% 100% 0%)' })
-    if (sliderImgs.length) gsap.set(sliderImgs, { 
-      scale: isMobile ? 1.08 : 1.12, 
-      filter: isMobile ? 'blur(8px)' : 'blur(10px)' 
-    })
+    if (sliderImgs.length) gsap.set(sliderImgs, { scale: 1.12, filter: 'blur(10px)' })
 
-    if (controls) gsap.set(controls, { opacity: 0, y: isMobile ? 12 : 18 })
-    if (caption) gsap.set(caption, { opacity: 0, y: isMobile ? 8 : 12 })
+    if (controls) gsap.set(controls, { opacity: 0, y: 18 })
+    if (caption) gsap.set(caption, { opacity: 0, y: 12 })
     if (pagination) gsap.set(pagination, { opacity: 0 })
-    if (prev) gsap.set(prev, { opacity: 0, x: isMobile ? -10 : -14 })
-    if (next) gsap.set(next, { opacity: 0, x: isMobile ? 10 : 14 })
+    if (prev) gsap.set(prev, { opacity: 0, x: -14 })
+    if (next) gsap.set(next, { opacity: 0, x: 14 })
 
-    if (desc) gsap.set(desc, { 
-      opacity: 0, 
-      y: isMobile ? 10 : 14, 
-      filter: isMobile ? 'blur(3px)' : 'blur(4px)' 
-    })
-    if (descM) gsap.set(descM, { 
-      opacity: 0, 
-      y: isMobile ? 10 : 14, 
-      filter: isMobile ? 'blur(3px)' : 'blur(4px)' 
-    })
+    if (desc) gsap.set(desc, { opacity: 0, y: 14, filter: 'blur(4px)' })
+    if (descM) gsap.set(descM, { opacity: 0, y: 14, filter: 'blur(4px)' })
 
     const m1 = desc ? desc.querySelector('[data-reveal-mask]') : null
     const m2 = descM ? descM.querySelector('[data-reveal-mask]') : null
     if (m1) gsap.set(m1, { scaleX: 1, transformOrigin: '0% 50%' })
     if (m2) gsap.set(m2, { scaleX: 1, transformOrigin: '0% 50%' })
 
-    if (!oncePlayed) {
-      if (heroLink) gsap.set(heroLink, { 
-        opacity: 0, 
-        scale: isMobile ? 0.96 : 0.92, 
-        rotate: isMobile ? -1 : -2, 
-        filter: isMobile ? 'blur(4px)' : 'blur(6px)' 
-      })
-      if (heroLinkText) gsap.set(heroLinkText, { y: isMobile ? 8 : 10 })
-      if (heroLinkIcon) gsap.set(heroLinkIcon, { 
-        opacity: 0, 
-        x: isMobile ? -6 : -8, 
-        rotate: isMobile ? -8 : -12 
-      })
-      if (heroScroll) gsap.set(heroScroll, { opacity: 0, y: isMobile ? 10 : 14 })
-    }
+    if (heroLink) gsap.set(heroLink, { opacity: 0, scale: 0.92, rotate: -2, filter: 'blur(6px)' })
+    if (heroLinkText) gsap.set(heroLinkText, { y: 10 })
+    if (heroLinkIcon) gsap.set(heroLinkIcon, { opacity: 0, x: -8, rotate: -12 })
+    if (heroScroll) gsap.set(heroScroll, { opacity: 0, y: 14 })
+  }
+
+  const resetMobile = () => {
+    if (vLine) gsap.set(vLine, { clearProps: 'all' })
+    if (hLine) gsap.set(hLine, { clearProps: 'all' })
+
+    if (sliderWrap) gsap.set(sliderWrap, { opacity: 0, y: 14, filter: 'blur(8px)' })
+    if (sliderImgs.length) gsap.set(sliderImgs, { scale: 1.06, filter: 'blur(6px)' })
+
+    if (controls) gsap.set(controls, { opacity: 0, y: 10 })
+    if (caption) gsap.set(caption, { opacity: 0, y: 10 })
+    if (pagination) gsap.set(pagination, { opacity: 0 })
+    if (prev) gsap.set(prev, { opacity: 0, x: -10 })
+    if (next) gsap.set(next, { opacity: 0, x: 10 })
+
+    if (desc) gsap.set(desc, { opacity: 0, y: 10, filter: 'blur(4px)' })
+    if (descM) gsap.set(descM, { opacity: 0, y: 10, filter: 'blur(4px)' })
+
+    const m1 = desc ? desc.querySelector('[data-reveal-mask]') : null
+    const m2 = descM ? descM.querySelector('[data-reveal-mask]') : null
+    if (m1) gsap.set(m1, { scaleX: 1, transformOrigin: '0% 50%' })
+    if (m2) gsap.set(m2, { scaleX: 1, transformOrigin: '0% 50%' })
+
+    if (heroLink) gsap.set(heroLink, { opacity: 0, y: 12, scale: 1, rotate: 0, filter: 'blur(4px)' })
+    if (heroLinkText) gsap.set(heroLinkText, { y: 0 })
+    if (heroLinkIcon) gsap.set(heroLinkIcon, { opacity: 1, x: 0, rotate: 0 })
+    if (heroScroll) gsap.set(heroScroll, { opacity: 0, y: 10 })
+  }
+
+  if (mobile) {
+    resetMobile()
+
+    const t0 = 0
+    if (sliderWrap) tl.to(sliderWrap, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.75, ease: 'power3.out' }, t0)
+    if (sliderImgs.length) tl.to(sliderImgs, { scale: 1, filter: 'blur(0px)', duration: 0.85, ease: 'power3.out' }, t0)
+
+    if (controls) tl.to(controls, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, t0 + 0.15)
+    if (caption) tl.to(caption, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, t0 + 0.18)
+    if (pagination) tl.to(pagination, { opacity: 1, duration: 0.5, ease: 'power2.out' }, t0 + 0.2)
+    if (prev) tl.to(prev, { opacity: 1, x: 0, duration: 0.5, ease: 'power3.out' }, t0 + 0.22)
+    if (next) tl.to(next, { opacity: 1, x: 0, duration: 0.5, ease: 'power3.out' }, t0 + 0.26)
+
+    if (descMask) tl.to(descMask, { scaleX: 0, duration: 0.45, ease: 'power3.inOut' }, t0 + 0.28)
+    if (desc) tl.to(desc, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, t0 + 0.3)
+    if (desc) tl.to(desc, { filter: 'blur(0px)', duration: 0.25, ease: 'power2.out' }, t0 + 0.38)
+
+    if (descMMask) tl.to(descMMask, { scaleX: 0, duration: 0.45, ease: 'power3.inOut' }, t0 + 0.28)
+    if (descM) tl.to(descM, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, t0 + 0.3)
+    if (descM) tl.to(descM, { filter: 'blur(0px)', duration: 0.25, ease: 'power2.out' }, t0 + 0.38)
+
+    if (heroLink) tl.to(heroLink, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.65, ease: 'power3.out' }, t0 + 0.44)
+    if (heroScroll) tl.to(heroScroll, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, t0 + 0.5)
+
+    makeTrigger({
+      trigger: hero,
+      start: 'top 85%',
+      end: 'bottom top',
+      once: true,
+      onEnter: () => tl.play(0)
+    })
+
+    return
   }
 
   const t0 = 0
-  const tSlider = isMobile ? 0.6 : 1.0
-  const tUi = isMobile ? 1.2 : 1.85
-  const tText = isMobile ? 1.1 : 1.75
-  const tCta = isMobile ? 1.6 : 2.55
+  const tSlider = 1.0
+  const tUi = 1.85
+  const tText = 1.75
+  const tCta = 2.55
 
-  if (vLine) tl.to(vLine, { 
-    scaleY: 1, 
-    duration: isMobile ? 0.7 : 1.0, 
-    ease: 'power2.out' 
-  }, t0)
-  
-  if (hLine) tl.to(hLine, { 
-    scaleX: 1, 
-    duration: isMobile ? 0.7 : 1.0, 
-    ease: 'power2.out' 
-  }, t0 + (isMobile ? 0.08 : 0.12))
+  if (vLine) tl.to(vLine, { scaleY: 1, duration: 1.0, ease: 'power2.out' }, t0)
+  if (hLine) tl.to(hLine, { scaleX: 1, duration: 1.0, ease: 'power2.out' }, t0 + 0.12)
 
-  if (sliderWrap) tl.to(sliderWrap, {
-    clipPath: 'inset(0% 0% 0% 0%)',
-    duration: isMobile ? 0.8 : 1.1,
-    ease: 'power3.out'
-  }, tSlider)
+  if (sliderWrap) tl.to(sliderWrap, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power3.out' }, tSlider)
+  if (sliderImgs.length) tl.to(sliderImgs, { scale: 1, filter: 'blur(0px)', duration: 1.15, ease: 'power3.out' }, tSlider)
 
-  if (sliderImgs.length) tl.to(sliderImgs, {
-    scale: 1,
-    filter: 'blur(0px)',
-    duration: isMobile ? 0.85 : 1.15,
-    ease: 'power3.out'
-  }, tSlider)
+  if (controls) tl.to(controls, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, tUi)
+  if (caption) tl.to(caption, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, tUi + 0.12)
+  if (pagination) tl.to(pagination, { opacity: 1, duration: 0.6, ease: 'power2.out' }, tUi + 0.18)
+  if (prev) tl.to(prev, { opacity: 1, x: 0, duration: 0.65, ease: 'power3.out' }, tUi + 0.2)
+  if (next) tl.to(next, { opacity: 1, x: 0, duration: 0.65, ease: 'power3.out' }, tUi + 0.28)
 
-  if (controls) tl.to(controls, { 
-    opacity: 1, 
-    y: 0, 
-    duration: isMobile ? 0.6 : 0.75, 
-    ease: 'power3.out' 
-  }, tUi)
-  
-  if (caption) tl.to(caption, { 
-    opacity: 1, 
-    y: 0, 
-    duration: isMobile ? 0.5 : 0.7, 
-    ease: 'power3.out' 
-  }, tUi + (isMobile ? 0.08 : 0.12))
-  
-  if (pagination) tl.to(pagination, { 
-    opacity: 1, 
-    duration: isMobile ? 0.45 : 0.6, 
-    ease: 'power2.out' 
-  }, tUi + (isMobile ? 0.12 : 0.18))
-  
-  if (prev) tl.to(prev, { 
-    opacity: 1, 
-    x: 0, 
-    duration: isMobile ? 0.5 : 0.65, 
-    ease: 'power3.out' 
-  }, tUi + (isMobile ? 0.14 : 0.2))
-  
-  if (next) tl.to(next, { 
-    opacity: 1, 
-    x: 0, 
-    duration: isMobile ? 0.5 : 0.65, 
-    ease: 'power3.out' 
-  }, tUi + (isMobile ? 0.18 : 0.28))
+  if (descMask) tl.to(descMask, { scaleX: 0, duration: 0.55, ease: 'power3.inOut' }, tText)
+  if (desc) tl.to(desc, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, tText + 0.02)
+  if (desc) tl.to(desc, { filter: 'blur(0px)', duration: 0.28, ease: 'power2.out' }, tText + 0.12)
 
-  if (descMask) tl.to(descMask, { 
-    scaleX: 0, 
-    duration: isMobile ? 0.4 : 0.55, 
-    ease: 'power3.inOut' 
-  }, tText)
-  
-  if (desc) tl.to(desc, { 
-    opacity: 1, 
-    y: 0, 
-    duration: isMobile ? 0.4 : 0.55, 
-    ease: 'power3.out' 
-  }, tText + 0.02)
-  
-  if (desc) tl.to(desc, { 
-    filter: 'blur(0px)', 
-    duration: isMobile ? 0.2 : 0.28, 
-    ease: 'power2.out' 
-  }, tText + 0.12)
+  if (descMMask) tl.to(descMMask, { scaleX: 0, duration: 0.55, ease: 'power3.inOut' }, tText)
+  if (descM) tl.to(descM, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, tText + 0.02)
+  if (descM) tl.to(descM, { filter: 'blur(0px)', duration: 0.28, ease: 'power2.out' }, tText + 0.12)
 
-  if (descMMask) tl.to(descMMask, { 
-    scaleX: 0, 
-    duration: isMobile ? 0.4 : 0.55, 
-    ease: 'power3.inOut' 
-  }, tText)
-  
-  if (descM) tl.to(descM, { 
-    opacity: 1, 
-    y: 0, 
-    duration: isMobile ? 0.4 : 0.55, 
-    ease: 'power3.out' 
-  }, tText + 0.02)
-  
-  if (descM) tl.to(descM, { 
-    filter: 'blur(0px)', 
-    duration: isMobile ? 0.2 : 0.28, 
-    ease: 'power2.out' 
-  }, tText + 0.12)
+  if (heroLink) tl.to(heroLink, { opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)', duration: 0.85, ease: 'power4.out' }, tCta)
+  if (heroLinkText) tl.to(heroLinkText, { y: 0, duration: 0.75, ease: 'power3.out' }, tCta + 0.06)
+  if (heroLinkIcon) tl.to(heroLinkIcon, { opacity: 1, x: 0, rotate: 0, duration: 0.75, ease: 'power3.out' }, tCta + 0.12)
+  if (heroScroll) tl.to(heroScroll, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, tCta + 0.2)
 
-  if (heroLink) tl.to(heroLink, {
-    opacity: 1,
-    scale: 1,
-    rotate: 0,
-    filter: 'blur(0px)',
-    duration: isMobile ? 0.65 : 0.85,
-    ease: 'power4.out'
-  }, tCta)
-
-  if (heroLinkText) tl.to(heroLinkText, { 
-    y: 0, 
-    duration: isMobile ? 0.6 : 0.75, 
-    ease: 'power3.out' 
-  }, tCta + (isMobile ? 0.04 : 0.06))
-  
-  if (heroLinkIcon) tl.to(heroLinkIcon, { 
-    opacity: 1, 
-    x: 0, 
-    rotate: 0, 
-    duration: isMobile ? 0.6 : 0.75, 
-    ease: 'power3.out' 
-  }, tCta + (isMobile ? 0.08 : 0.12))
-  
-  if (heroScroll) tl.to(heroScroll, { 
-    opacity: 1, 
-    y: 0, 
-    duration: isMobile ? 0.6 : 0.75, 
-    ease: 'power3.out' 
-  }, tCta + (isMobile ? 0.12 : 0.2))
-
-  reset()
+  resetDesktop()
 
   makeTrigger({
     trigger: hero,
@@ -322,16 +299,15 @@ const initHeroPremiumRest = (hero) => {
     end: 'bottom top',
     once: false,
     onEnter: () => {
-      reset()
+      resetDesktop()
       tl.play(0)
-      oncePlayed = true
     },
     onEnterBack: () => {
-      reset()
+      resetDesktop()
       tl.play(0)
     },
-    onLeave: () => reset(),
-    onLeaveBack: () => reset()
+    onLeave: () => resetDesktop(),
+    onLeaveBack: () => resetDesktop()
   })
 }
 

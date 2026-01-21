@@ -256,7 +256,6 @@ const initPhilosophyPremium = (ph) => {
   reset()
   applyHover()
 
-  // Быстрая анимация при скролле
   if (!reduce) {
     const tl = gsap.timeline({
       scrollTrigger: {

@@ -603,11 +603,9 @@ const initProjectsDesktop = () => {
     const label = labelSel ? q(block, labelSel) : null
     const name = nameSel ? q(block, nameSel) : null
 
-    // Исправление: очищаем ключ от недопустимых символов
     const getSafeKey = (el, prefix) => {
       if (!el) return ''
       const className = el.className || ''
-      // Оставляем только буквы, цифры и подчеркивания
       const safe = className.replace(/[^a-zA-Z0-9]/g, '_')
       return `${prefix}_${safe || 'b'}`
     }
@@ -785,7 +783,6 @@ const initProjectsDesktop = () => {
     const label = q(block, '.projects-label')
     const name = q(block, '.projects-name')
 
-    // Используем фиксированные безопасные ключи для проекта 4
     const labelKey = 'p4_label'
     const nameKey = 'p4_name'
 
