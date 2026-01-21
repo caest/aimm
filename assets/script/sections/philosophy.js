@@ -5,6 +5,11 @@ const prefersReducedMotion = () =>
   window.matchMedia &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+const isMobile992 = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(max-width: 992px)').matches
+
 const ensureMask = (el, bgEl) => {
   if (!el) return null
 
@@ -137,6 +142,7 @@ const wrapLinesInP = (p) => {
 
 const initPhilosophyPremium = (ph) => {
   const reduce = prefersReducedMotion()
+  const mobile = isMobile992()
 
   const lineH = ph.querySelector('.philosophy-line-horizontal')
   const lineV = ph.querySelector('.philosophy-line-vertical')
@@ -156,6 +162,57 @@ const initPhilosophyPremium = (ph) => {
   const controls = ph.querySelector('.philosophy-controls')
   const fraction = ph.querySelector('.philosophy-fraction')
   const progress = ph.querySelector('.philosophy-progress span')
+
+  if (mobile) {
+    const items = [title, desc, leftImg, leftText, sliderWrap, controls, fraction].filter(Boolean)
+
+    const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } })
+
+    const reset = () => {
+      if (lineH) gsap.set(lineH, { scaleX: 1, clearProps: 'transformOrigin' })
+      if (lineV) gsap.set(lineV, { scaleY: 1, clearProps: 'transformOrigin' })
+      if (lineHT) gsap.set(lineHT, { scaleX: 1, clearProps: 'transformOrigin' })
+
+      if (items.length) gsap.set(items, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 14, filter: 'blur(10px)' })
+      if (progress) gsap.set(progress, reduce ? { scaleX: 1 } : { scaleX: 0, transformOrigin: '0% 50%' })
+      if (slider) gsap.set(slider, reduce ? { opacity: 1, y: 0, filter: 'blur(0px)' } : { opacity: 0, y: 10, filter: 'blur(10px)' })
+      if (slideImgs.length) gsap.set(slideImgs, reduce ? { scale: 1, filter: 'blur(0px)' } : { scale: 1.02, filter: 'blur(6px)' })
+
+      tl.pause(0)
+    }
+
+    if (!reduce) {
+      tl.to(items, {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        duration: 0.9,
+        ease: 'power3.out',
+        stagger: 0.08
+      }, 0)
+
+      if (slider) tl.to(slider, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out' }, 0.25)
+      if (slideImgs.length) tl.to(slideImgs, { scale: 1, filter: 'blur(0px)', duration: 1.0, ease: 'power3.out' }, 0.25)
+      if (progress) tl.to(progress, { scaleX: 1, duration: 0.9, ease: 'power2.out' }, 0.55)
+    } else {
+      tl.add(() => {}, 0)
+    }
+
+    reset()
+
+    makeTrigger({
+      trigger: ph,
+      start: 'top 90%',
+      end: 'bottom top',
+      once: false,
+      onEnter: () => { reset(); tl.play(0) },
+      onEnterBack: () => { reset(); tl.play(0) },
+      onLeave: () => { tl.pause(0); reset() },
+      onLeaveBack: () => { tl.pause(0); reset() }
+    })
+
+    return
+  }
 
   const titleChars = title ? splitToChars(title) : []
   const descWords = splitToWordsKeepHTML(desc)

@@ -1163,7 +1163,7 @@ body {
   right: 160px;
 }
 .projects-second-wrap {
-  padding-top: 110px;
+  padding-top: 150px;
 }
 .projects-second-image {
   width: -moz-fit-content;
@@ -1281,7 +1281,7 @@ body {
   align-items: center;
   justify-content: center;
   width: 25%;
-  height: 144px;
+  height: 100px;
   cursor: pointer;
 }
 .clients-logo-wrap {
@@ -1757,6 +1757,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  z-index: 2;
 }
 .social-container-top span {
   font-weight: 400;
@@ -1767,18 +1769,27 @@ body {
   color: #fff;
 }
 .social-container-bottom {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
   font-weight: 400;
   font-size: 14px;
   line-height: 16px;
   letter-spacing: -1.2%;
   color: #fff;
+  text-decoration: none;
+}
+.social-container-bottom span {
   max-width: 150px;
   position: relative;
+  z-index: 2;
+  display: block;
 }
 .social-container-bottom::before {
   content: "";
-  width: 100%;
-  height: 100%;
   position: absolute;
   inset: 0;
 }
@@ -4825,8 +4836,7 @@ body {
 
 /* чорна версія 4 (тільки внизу) */
 .projects-count-bottom .num-4--base {
-  bottom: -60px;
-  transform: translateY(40px);
+  bottom: -100px;
 }
 
 .num-3 {
@@ -4857,8 +4867,7 @@ body {
 }
 
 .projects-count-bottom .num-3--base {
-  bottom: 196px;
-  transform: translateY(36px);
+  bottom: 40px;
 }
 
 .num-2 {
@@ -4874,15 +4883,15 @@ body {
   mix-blend-mode: difference;
 }
 
-/* “2” на білому */
 .num-2--base {
-  /* top:-70px; */
-  top: -34px;
-  transform: translateY(36px);
+  top: 6px;
 }
 
 .projects-second-image {
   z-index: 1;
+}
+.projects-second-image img {
+  height: 600px;
 }
 
 .projects-count-img {
@@ -4924,8 +4933,8 @@ body {
   .projects-second-image .projects-count-img {
     width: 280px;
   }
-  .projects-count-bottom .num-3--base {
-    bottom: 76px;
+  .projects-second-image img {
+    height: initial;
   }
   .num-2 {
     height: 110px;
@@ -4933,7 +4942,7 @@ body {
     left: 40px;
   }
   .num-2--base {
-    top: -100px;
+    top: -65px;
   }
   .num-2--blend {
     top: -65px;

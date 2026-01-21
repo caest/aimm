@@ -69,7 +69,7 @@ const ensureVWrap = (social) => {
   el.style.width = '100%'
   el.style.height = '100%'
   el.style.pointerEvents = 'none'
-  el.style.zIndex = '9999'
+  el.style.zIndex = '-1'
 
   return el
 }

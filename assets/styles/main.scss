@@ -1247,7 +1247,7 @@ height: 1000px;
 	}
 	&-second {
 		&-wrap {
-			padding-top: 110px;
+			padding-top: 150px;
 		}
 		&-image {
 
@@ -1392,7 +1392,7 @@ height: 1000px;
 		align-items: center;
 		justify-content: center;
 		width:25%;
-		height: 144px;
+		height: 100px;
 		cursor: pointer;
 	}
 	&-see-more {
@@ -1868,51 +1868,67 @@ height: 1000px;
     // ============================
     // SOCIAL CARD
     // ============================
-    &-container {
-        background-repeat: no-repeat;
-        background-size: cover;
-        max-width: 315px;
-        width: 100%;
-        height: 190px;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
+   &-container {
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-width: 315px;
+  width: 100%;
+  height: 190px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
 
-        &-top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+  &-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
 
-            span {
-                font-weight: 400;
-                font-size: 10px;
-                line-height: 12px;
-                letter-spacing: 16%;
-                text-transform: uppercase;
-                color: #fff;
-            }
-        }
-
-        &-bottom {
-            font-weight: 400;
-            font-size: 14px;
-            line-height: 16px;
-            letter-spacing: -1.2%;
-            color: #fff;
-            max-width: 150px;
-            position: relative;
-
-            &::before {
-                content: "";
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                inset: 0;
-            }
-        }
+    span {
+      font-weight: 400;
+      font-size: 10px;
+      line-height: 12px;
+      letter-spacing: 16%;
+      text-transform: uppercase;
+      color: #fff;
     }
+  }
+
+  &-bottom {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: -1.2%;
+    color: #fff;
+
+    text-decoration: none;
+
+    span {
+      max-width: 150px;
+      position: relative;
+      z-index: 2;
+      display: block;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+  }
+}
+
 }
 
 
@@ -5277,8 +5293,7 @@ padding-top: 24px;
 
 /* чорна версія 4 (тільки внизу) */
 .projects-count-bottom .num-4--base{
-  bottom:-60px;
-  transform:translateY(40px);
+  bottom:-100px;
 }
 .num-3{
   position:absolute;
@@ -5307,8 +5322,7 @@ padding-top: 24px;
 }
 
 .projects-count-bottom .num-3--base{
-  bottom:196px;
-  transform:translateY(36px);
+  bottom:40px;
 }
 
 .num-2{
@@ -5324,14 +5338,14 @@ top:-144px;
   mix-blend-mode:difference;
 }
 
-/* “2” на білому */
 .num-2--base{
-	/* top:-70px; */
-	top:-34px; 
-  transform:translateY(36px);
+	top:6px; 
 }
 .projects-second-image {
 	z-index: 1;
+	img {
+		height: 600px;
+	}
 }
 
 .projects-count-img{
@@ -5362,6 +5376,7 @@ top:-144px;
   right: 100px;
 }
 @media(max-width:1200px) {
+
 	.clients-line-horizontal {
 		display: none;
 	}
@@ -5371,16 +5386,16 @@ top:-144px;
 	.projects-second-image .projects-count-img {
 		width: 280px;
 	}
-	.projects-count-bottom .num-3--base {
-		bottom: 76px;
-	}
+.projects-second-image img {
+    height: initial;
+}
 	.num-2 {
 		height: 110px;
 		width: 70px;
 		left: 40px;
 	}
     .num-2--base {
-        top: -100px;
+        top: -65px;
     }
 	.num-2--blend {
 		top: -65px;
